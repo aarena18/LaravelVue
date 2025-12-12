@@ -183,14 +183,20 @@ const revealSelected = async () => {
                             </option>
                         </select>
                         <button
-                            v-if="selectedApiKey && !revealedKeys[Number(selectedApiKey)]"
+                            v-if="
+                                selectedApiKey &&
+                                !revealedKeys[Number(selectedApiKey)]
+                            "
                             @click="revealSelected"
                             class="rounded bg-yellow-500 px-4 py-2 font-semibold text-white hover:bg-yellow-600"
                         >
                             Reveal
                         </button>
                         <button
-                            v-else-if="selectedApiKey && revealedKeys[Number(selectedApiKey)]"
+                            v-else-if="
+                                selectedApiKey &&
+                                revealedKeys[Number(selectedApiKey)]
+                            "
                             @click="hideRevealedKey"
                             class="rounded bg-gray-500 px-4 py-2 font-semibold text-white hover:bg-gray-600"
                         >

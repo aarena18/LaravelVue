@@ -195,10 +195,7 @@ const closeKeyModal = () => {
                                 </button>
                             </div>
                         </div>
-                        <div
-                            v-if="revealedKeys[key.id]"
-                            class="flex gap-2"
-                        >
+                        <div v-if="revealedKeys[key.id]" class="flex gap-2">
                             <input
                                 :value="revealedKeys[key.id]"
                                 readonly
