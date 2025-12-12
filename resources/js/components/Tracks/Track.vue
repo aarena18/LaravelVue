@@ -20,10 +20,13 @@
         <div class="px-6 pb-4">
             <!-- Playlist Management for Logged-in Users -->
             <div
-                v-if="$page.props.auth.user && userPlaylists.length > 0"
+                v-if="$page.props.auth.user"
                 class="mb-3"
             >
-                <div class="relative">
+                <div v-if="userPlaylists.length === 0" class="text-sm text-gray-500 dark:text-gray-400 p-2 text-center">
+                    Créez une playlist pour ajouter cette musique
+                </div>
+                <div v-else class="relative">
                     <button
                         @click="toggleDropdown"
                         class="flex w-full items-center justify-between rounded bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600"

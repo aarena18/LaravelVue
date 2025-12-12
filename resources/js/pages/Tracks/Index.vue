@@ -41,7 +41,7 @@
 <script>
     import MusicLayout from '@/layouts/MusicLayout.vue';
     import Track from '@/components/Tracks/Track.vue';
-    import { Link } from '@inertiajs/vue3';
+    import { Link, usePage, router } from '@inertiajs/vue3';
 
     export default {
         name: 'Index',
@@ -60,12 +60,27 @@
                 audio: null,
                 currentAudio: null,
                 search: '',
+                lastUserId: null,
             }
         },
         computed: {
             filteredTracks() {
                 return this.tracks.filter(track => track.title.toLowerCase().includes(this.search.toLowerCase()));
             },
+        },
+        mounted() {
+            const page = usePage();
+            this.lastUserId = page.props.auth.user?.id;
+        },
+        watch: {
+            '$page.props.auth.user.id': function(newId, oldId) {
+                // When user ID changes or user logs out/in, reload page
+                if (newId !== this.lastUserId) {
+                    this.lastUserId = newId;
+                    // Reload without preserving state to get fresh data
+                    router.get(route('tracks.index'), {}, { preserveState: false });
+                }
+            }
         },
         methods: {
             changeCurrentAudio() {

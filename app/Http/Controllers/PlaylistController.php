@@ -16,13 +16,23 @@ class PlaylistController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $playlists = Playlist::withCount('tracks')
+        // Only return playlists that belong to the authenticated user
+        $user = $request->user();
+
+        $query = Playlist::withCount('tracks')
             ->with(['tracks' => function ($query) {
                 $query->select('tracks.id', 'tracks.image')->limit(1);
-            }])
-            ->get()
+            }]);
+
+        if ($user) {
+            $query->where('user_id', $user->id);
+        } else {
+            $query->whereNull('id'); // return empty
+        }
+
+        $playlists = $query->get()
             ->map(function ($playlist) {
                 $playlist->first_track_image = $playlist->tracks->first()?->image;
                 unset($playlist->tracks);
@@ -73,8 +83,13 @@ class PlaylistController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Playlist $playlist)
+    public function edit(Request $request, Playlist $playlist)
     {
+        // Ensure the authenticated user owns this playlist
+        if ($request->user()->id !== $playlist->user_id) {
+            abort(403);
+        }
+
         $playlist->load('tracks');
         $tracks = Track::where('is_visible', true)->get();
 
@@ -89,6 +104,10 @@ class PlaylistController extends Controller
      */
     public function update(PlaylistRequest $request, Playlist $playlist)
     {
+        // Ensure owner
+        if ($request->user()->id !== $playlist->user_id) {
+            abort(403);
+        }
         $tracks = Track::whereIn('slug', $request->tracks)->where('is_visible', true)->get();
 
         if (count($request->tracks) !== $tracks->count()) {
@@ -108,8 +127,16 @@ class PlaylistController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Playlist $playlist)
+    public function destroy(Request $request, Playlist $playlist)
     {
+        // Ensure owner
+        if ($request->user()->id !== $playlist->user_id) {
+            abort(403);
+        }
+
+        // Detach all tracks from the playlist to avoid foreign key constraint
+        $playlist->tracks()->detach();
+
         $playlist->delete();
 
         return redirect()->back();
@@ -118,8 +145,12 @@ class PlaylistController extends Controller
     /**
      * Attach a track to a playlist.
      */
-    public function attachTrack(Playlist $playlist, Track $track)
+    public function attachTrack(Request $request, Playlist $playlist, Track $track)
     {
+        if ($request->user()->id !== $playlist->user_id) {
+            abort(403);
+        }
+
         // Check if track is already in the playlist
         if (!$playlist->tracks()->where('track_id', $track->id)->exists()) {
             $playlist->tracks()->attach($track->id);
@@ -131,8 +162,12 @@ class PlaylistController extends Controller
     /**
      * Detach a track from a playlist.
      */
-    public function detachTrack(Playlist $playlist, Track $track)
+    public function detachTrack(Request $request, Playlist $playlist, Track $track)
     {
+        if ($request->user()->id !== $playlist->user_id) {
+            abort(403);
+        }
+
         $playlist->tracks()->detach($track->id);
 
         return redirect()->back();
