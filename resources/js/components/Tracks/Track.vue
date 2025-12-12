@@ -19,11 +19,11 @@
         </div>
         <div class="px-6 pb-4">
             <!-- Playlist Management for Logged-in Users -->
-            <div
-                v-if="$page.props.auth.user"
-                class="mb-3"
-            >
-                <div v-if="userPlaylists.length === 0" class="text-sm text-gray-500 dark:text-gray-400 p-2 text-center">
+            <div v-if="$page.props.auth.user" class="mb-3">
+                <div
+                    v-if="userPlaylists.length === 0"
+                    class="p-2 text-center text-sm text-gray-500 dark:text-gray-400"
+                >
                     Créez une playlist pour ajouter cette musique
                 </div>
                 <div v-else class="relative">

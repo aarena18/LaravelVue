@@ -22,9 +22,11 @@ class PlaylistController extends Controller
         $user = $request->user();
 
         $query = Playlist::withCount('tracks')
-            ->with(['tracks' => function ($query) {
-                $query->select('tracks.id', 'tracks.image')->limit(1);
-            }]);
+            ->with([
+                'tracks' => function ($query) {
+                    $query->select('tracks.id', 'tracks.image')->limit(1);
+                }
+            ]);
 
         if ($user) {
             $query->where('user_id', $user->id);
