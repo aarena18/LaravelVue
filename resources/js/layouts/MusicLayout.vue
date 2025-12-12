@@ -21,6 +21,13 @@
                         >
                             Playlists
                         </Link>
+                        <Link
+                            v-if="$page.props.auth.user"
+                            :href="route('api-tester')"
+                            :class="[route().current().includes('api-tester') ? 'text-white-500' : 'text-gray-400']"
+                        >
+                            API Tester
+                        </Link>
                     </div>
                     </div>
                 </div>

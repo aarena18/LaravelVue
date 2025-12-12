@@ -39,4 +39,28 @@ class ApiKeyController extends Controller
 
         return redirect()->back();
     }
+
+    /**
+     * Reveal an API key for the owner (returns via flash so frontend can display it once).
+     */
+    public function reveal(Request $request, ApiKey $apiKey)
+    {
+        if ($apiKey->user_id !== $request->user()->id) {
+            abort(403);
+        }
+
+        return redirect()->back()->with('api_key', $apiKey->key);
+    }
+
+    /**
+     * Return API key as JSON for the owner (used by the API tester frontend).
+     */
+    public function revealJson(Request $request, ApiKey $apiKey)
+    {
+        if ($apiKey->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        return response()->json(['key' => $apiKey->key]);
+    }
 }
