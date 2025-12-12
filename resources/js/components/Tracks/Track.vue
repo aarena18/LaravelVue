@@ -1,33 +1,53 @@
 <template>
-    <div class="max-w-sm rounded overflow-hidden shadow-lg flex flex-col h-full">
+    <div
+        class="flex h-full max-w-sm flex-col overflow-hidden rounded shadow-lg"
+    >
         <div
-            class="w-full h-64 cursor-pointer flex-shrink-0"
+            class="h-64 w-full flex-shrink-0 cursor-pointer"
             @click="handleClick"
         >
-            <img class="w-full h-full object-cover" :src="`/storage/${track.image}`">
+            <img
+                class="h-full w-full object-cover"
+                :src="`/storage/${track.image}`"
+            />
         </div>
-        <div class="px-6 py-4 cursor-pointer" @click="handleClick">
-            <div class="font-bold text-xl mb-2">{{ track.title }}</div>
-            <small class="text-gray-700 text-base">
+        <div class="cursor-pointer px-6 py-4" @click="handleClick">
+            <div class="mb-2 text-xl font-bold">{{ track.title }}</div>
+            <small class="text-base text-gray-700">
                 {{ track.artist }}
             </small>
         </div>
         <div class="px-6 pb-4">
             <!-- Playlist Management for Logged-in Users -->
-            <div v-if="$page.props.auth.user && userPlaylists.length > 0" class="mb-3">
+            <div
+                v-if="$page.props.auth.user && userPlaylists.length > 0"
+                class="mb-3"
+            >
                 <div class="relative">
                     <button
                         @click="toggleDropdown"
-                        class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded flex items-center justify-between"
+                        class="flex w-full items-center justify-between rounded bg-blue-500 px-4 py-2 font-semibold text-white hover:bg-blue-600"
                     >
-                        <span>{{ showDropdown ? 'Fermer' : 'Ajouter à une playlist' }}</span>
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        <span>{{
+                            showDropdown ? 'Fermer' : 'Ajouter à une playlist'
+                        }}</span>
+                        <svg
+                            class="h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M19 9l-7 7-7-7"
+                            ></path>
                         </svg>
                     </button>
                     <div
                         v-if="showDropdown"
-                        class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded shadow-lg max-h-48 overflow-y-auto"
+                        class="absolute z-10 mt-1 max-h-48 w-full overflow-y-auto rounded border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
                     >
                         <div
                             v-for="playlist in userPlaylists"
@@ -38,14 +58,14 @@
                             <button
                                 v-if="isTrackInPlaylist(playlist.id)"
                                 @click="removeFromPlaylist(playlist)"
-                                class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded"
+                                class="rounded bg-red-500 px-2 py-1 text-xs text-white hover:bg-red-600"
                             >
                                 Retirer
                             </button>
                             <button
                                 v-else
                                 @click="addToPlaylist(playlist)"
-                                class="bg-green-500 hover:bg-green-600 text-white text-xs py-1 px-2 rounded"
+                                class="rounded bg-green-500 px-2 py-1 text-xs text-white hover:bg-green-600"
                             >
                                 Ajouter
                             </button>
@@ -58,13 +78,13 @@
             <div v-if="$page.props.isAdmin" class="grid grid-cols-2 gap-2">
                 <Link
                     :href="route('tracks.edit', { track: track })"
-                    class="bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded text-center"
+                    class="rounded border border-green-500 bg-transparent px-4 py-2 text-center font-semibold text-green-700 hover:border-transparent hover:bg-green-500 hover:text-white"
                 >
                     Modifier
                 </Link>
                 <span
                     @click="destroy"
-                    class="bg-transparent hover:bg-red-500 text-red-700 font-semibold hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded text-center cursor-pointer"
+                    class="cursor-pointer rounded border border-red-500 bg-transparent px-4 py-2 text-center font-semibold text-red-700 hover:border-transparent hover:bg-red-500 hover:text-white"
                 >
                     Supprimer
                 </span>
@@ -74,74 +94,77 @@
 </template>
 
 <script>
-    import { Link } from '@inertiajs/vue3';
+import { Link } from '@inertiajs/vue3';
 
-    export default {
-        name: 'Track',
-        emits: ['listen'],
-        components: {
-            Link,
+export default {
+    name: 'Track',
+    emits: ['listen'],
+    components: {
+        Link,
+    },
+    props: {
+        track: Object,
+        userPlaylists: {
+            type: Array,
+            default: () => [],
         },
-        props: {
-            track: Object,
-            userPlaylists: {
-                type: Array,
-                default: () => [],
-            },
-            trackPlaylistIds: {
-                type: Array,
-                default: () => [],
-            },
+        trackPlaylistIds: {
+            type: Array,
+            default: () => [],
         },
-        data() {
-            return {
-                showDropdown: false,
-            };
-        },
-        methods: {
-            destroy() {
-                this.$inertia.delete(route('tracks.destroy', { track: this.track }), {
+    },
+    data() {
+        return {
+            showDropdown: false,
+        };
+    },
+    methods: {
+        destroy() {
+            this.$inertia.delete(
+                route('tracks.destroy', { track: this.track }),
+                {
                     preserveScroll: true,
-                });
-            },
-            handleClick() {
-                this.$emit('listen', this.track);
-            },
-            toggleDropdown() {
-                this.showDropdown = !this.showDropdown;
-            },
-            isTrackInPlaylist(playlistId) {
-                return this.trackPlaylistIds.includes(playlistId);
-            },
-            addToPlaylist(playlist) {
-                this.$inertia.post(
-                    route('playlists.tracks.attach', { 
-                        playlist: playlist.slug, 
-                        track: this.track.slug 
-                    }),
-                    {},
-                    {
-                        preserveScroll: true,
-                        onSuccess: () => {
-                            this.showDropdown = false;
-                        },
-                    }
-                );
-            },
-            removeFromPlaylist(playlist) {
-                this.$inertia.delete(
-                    route('playlists.tracks.detach', { 
-                        playlist: playlist.slug, 
-                        track: this.track.slug 
-                    }),
-                    {
-                        preserveScroll: true,
-                        onSuccess: () => {
-                            this.showDropdown = false;
-                        },
-                    }
-                );
-            },
+                },
+            );
         },
-    }
+        handleClick() {
+            this.$emit('listen', this.track);
+        },
+        toggleDropdown() {
+            this.showDropdown = !this.showDropdown;
+        },
+        isTrackInPlaylist(playlistId) {
+            return this.trackPlaylistIds.includes(playlistId);
+        },
+        addToPlaylist(playlist) {
+            this.$inertia.post(
+                route('playlists.tracks.attach', {
+                    playlist: playlist.slug,
+                    track: this.track.slug,
+                }),
+                {},
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        this.showDropdown = false;
+                    },
+                },
+            );
+        },
+        removeFromPlaylist(playlist) {
+            this.$inertia.delete(
+                route('playlists.tracks.detach', {
+                    playlist: playlist.slug,
+                    track: this.track.slug,
+                }),
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        this.showDropdown = false;
+                    },
+                },
+            );
+        },
+    },
+};
 </script>
